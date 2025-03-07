@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-xl font-bold">E-Commerce</a>
+        <div>
+            <a th:href="@{/}" class="mr-4 hover:underline">Trang chủ</a>
+            <span th:if="${session.user != null}">
+        <a th:href="@{/cart}" class="mr-4 hover:underline">🛒 Giỏ hàng</a>
+        <a th:href="@{/auth/logout}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Đăng xuất</a>
+      </span>
+            <span th:if="${session.user == null}">
+        <a th:href="@{/auth/login}" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Đăng nhập</a>
+      </span>
+        </div>
+    </div>
+</nav>
+
+<!-- Nội dung giỏ hàng -->
+<div class="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
+    <h1 class="text-2xl font-bold text-gray-800">Giỏ hàng của bạn</h1>
+
+    <div th:if="${cartItems.isEmpty()}">
+        <p class="text-gray-600 mt-4">Giỏ hàng của bạn đang trống.</p>
+    </div>
+
+    <div th:if="${!cartItems.isEmpty()}">
+        <table class="w-full mt-4 border-collapse">
+            <thead>
+            <tr class="bg-gray-200">
+                <th class="border p-2">Hình ảnh</th>
+                <th class="border p-2">Tên sản phẩm</th>
+                <th class="border p-2">Giá</th>
+                <th class="border p-2">Số lượng</th>
+                <th class="border p-2">Tổng</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${cartItems}">
+                <td class="border p-2">
+                    <img th:src="${item.product.imageUrl}" class="w-16 h-16 object-cover rounded-md">
+                </td>
+                <td class="border p-2" th:text="${item.product.name}"></td>
+                <td class="border p-2 text-blue-600 font-bold" th:text="'$' + ${item.product.price}"></td>
+                <td class="border p-2 text-center" th:text="${item.quantity}"></td>
+                <td class="border p-2 text-green-600 font-bold" th:text="'$' + ${item.quantity * item.product.price}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-4 text-right">
+            <p class="text-lg font-bold">Tổng cộng: <span class="text-green-600" th:text="'$' + ${totalAmount}"></span></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

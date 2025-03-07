@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách sản phẩm</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function searchProducts() {
+      let query = document.getElementById("search").value;
+      fetch(`/products/search?name=${query}`)
+              .then(response => response.json())
+              .then(data => {
+                let productContainer = document.getElementById("product-list");
+                productContainer.innerHTML = "";
+                data.forEach(product => {
+                  productContainer.innerHTML += `
+                            <div class="bg-white p-4 shadow-md rounded-lg">
+                                <img src="${product.imageUrl}" class="w-full h-40 object-cover rounded-lg">
+                                <h2 class="text-lg font-bold mt-2">${product.name}</h2>
+                                <p class="text-blue-600 font-bold mt-2">$${product.price}</p>
+                            </div>`;
+                });
+              });
+    }
+  </script>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="bg-blue-600 text-white p-4 shadow-md">
+  <div class="container mx-auto flex justify-between items-center">
+    <a href="/" class="text-xl font-bold">E-Commerce</a>
+    <div>
+      <a th:href="@{/}" class="mr-4 hover:underline">Trang chủ</a>
+      <a th:href="@{/auth/logout}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Đăng xuất</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Tìm kiếm sản phẩm -->
+<div class="container mx-auto mt-6 text-center">
+  <input type="text" id="search" oninput="searchProducts()"
+         class="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+         placeholder="Nhập tên sản phẩm...">
+</div>
+
+<!-- Danh sách sản phẩm -->
+<div class="container mx-auto mt-6">
+  <h1 class="text-3xl font-bold text-gray-800 text-center">Danh sách sản phẩm</h1>
+  <div id="product-list" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+    <div th:each="product : ${products}" class="bg-white p-4 shadow-md rounded-lg">
+      <img th:src="${product.imageUrl}" class="w-full h-40 object-cover rounded-lg">
+      <h2 class="text-lg font-bold mt-2" th:text="${product.name}"></h2>
+      <p class="text-blue-600 font-bold mt-2" th:text="'$' + ${product.price}"></p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Trang chủ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function searchProducts() {
+      let query = document.getElementById("search").value;
+      fetch(`/products/search?name=${query}`)
+              .then(response => response.json())
+              .then(data => {
+                let productContainer = document.getElementById("product-list");
+                productContainer.innerHTML = "";
+                data.forEach(product => {
+                  productContainer.innerHTML += `
+                    <div class="bg-white p-4 shadow-md rounded-lg">
+                        <img src="${product.imageUrl}" class="w-full h-40 object-cover rounded-lg">
+                        <h2 class="text-lg font-bold mt-2">${product.name}</h2>
+                        <p class="text-blue-600 font-bold mt-2">$${product.price}</p>
+                        <button onclick="addToCart(${product.id})"
+                                class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+                          Thêm vào giỏ hàng
+                        </button>
+                    </div>`;
+                });
+              });
+    }
+
+    function addToCart(productId) {
+      fetch(`/cart/add/${productId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+              .then(response => response.json())
+              .then(data => {
+                alert(data.message);
+                let cartCountElement = document.getElementById("cart-count");
+                if (cartCountElement) {
+                  cartCountElement.textContent = data.cartCount;
+                  cartCountElement.style.display = "inline";
+                } else {
+                  let cartLink = document.querySelector("#cart-link");
+                  let span = document.createElement("span");
+                  span.id = "cart-count";
+                  span.className = "absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 rounded-full";
+                  span.textContent = data.cartCount;
+                  cartLink.appendChild(span);
+                }
+              })
+              .catch(error => alert("Lỗi khi thêm vào giỏ hàng!"));
+    }
+  </script>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="bg-blue-600 text-white p-4 shadow-md">
+  <div class="container mx-auto flex justify-between items-center">
+    <a href="/" class="text-xl font-bold">E-Commerce</a>
+    <div>
+      <a th:href="@{/}" class="mr-4 hover:underline">Trang chủ</a>
+
+      <!-- Nếu đăng nhập, hiển thị giỏ hàng & đăng xuất -->
+      <span th:if="${session.user != null}">
+        <a id="cart-link" th:href="@{/cart}" class="relative mr-4 hover:underline">
+          🛒 Giỏ hàng
+          <span id="cart-count"
+                th:text="${session.cartCount}"
+                class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 rounded-full"
+                th:if="${session.cartCount != null and session.cartCount > 0}">
+          </span>
+        </a>
+        <a th:href="@{/auth/logout}" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Đăng xuất</a>
+      </span>
+
+      <!-- Nếu chưa đăng nhập, hiển thị đăng nhập & đăng ký -->
+      <span th:if="${session.user == null}">
+        <a th:href="@{/auth/login}" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Đăng nhập</a>
+        <a th:href="@{/auth/register}" class="px-4 py-2 ml-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">Đăng ký</a>
+      </span>
+    </div>
+  </div>
+</nav>
+
+<!-- Tìm kiếm sản phẩm -->
+<div class="container mx-auto mt-6 text-center">
+  <input type="text" id="search" oninput="searchProducts()"
+         class="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+         placeholder="Nhập tên sản phẩm...">
+</div>
+
+<!-- Danh sách sản phẩm -->
+<div class="container mx-auto mt-6">
+  <h1 class="text-3xl font-bold text-gray-800 text-center">Danh sách sản phẩm</h1>
+  <div id="product-list" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+    <div th:each="product : ${products}" class="bg-white p-4 shadow-md rounded-lg">
+      <img th:src="${product.imageUrl}" class="w-full h-40 object-cover rounded-lg">
+      <h2 class="text-lg font-bold mt-2" th:text="${product.name}"></h2>
+      <p class="text-blue-600 font-bold mt-2" th:text="'$' + ${product.price}"></p>
+      <button th:if="${session.user != null}"
+              th:attr="onclick='addToCart(' + ${product.id} + ')'"
+              class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+        Thêm vào giỏ hàng
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

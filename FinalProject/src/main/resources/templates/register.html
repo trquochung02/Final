@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="container mx-auto mt-10">
+    <h2 class="text-2xl font-bold text-center">Đăng ký tài khoản</h2>
+    <form th:action="@{/auth/register}" method="post" class="max-w-md mx-auto bg-white p-6 shadow-md">
+        <label class="block">
+            <span class="text-gray-700">Username</span>
+            <input type="text" name="username" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm" required>
+        </label>
+        <label class="block mt-4">
+            <span class="text-gray-700">Password</span>
+            <input type="password" name="password" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm" required>
+        </label>
+        <button type="submit" class="mt-4 w-full bg-blue-500 text-white p-2 rounded-md">Đăng ký</button>
+    </form>
+    <p class="text-center mt-4">Đã có tài khoản? <a th:href="@{/auth/login}" class="text-blue-500">Đăng nhập</a></p>
+</div>
+</body>
+</html>
